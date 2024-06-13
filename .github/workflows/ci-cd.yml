@@ -10,6 +10,9 @@ on:
         description: 'Parameter 1 description'
         required: false
         default: 'default_value'
+      param2:
+        description: 'Parameter 2 description'
+        required: true
 
 jobs:
   build:
@@ -49,9 +52,10 @@ jobs:
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/income-expense-calculator:${{ github.sha }}
         run: |
-          ssh user@your-server-ip <<EOF
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh-add -
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} <<EOF
             docker pull $DOCKER_IMAGE
-            docker stop income-expense-calculator || true
-            docker rm income-expense-calculator || true
-            docker run -d -p 5000:5000 --name income-expense-calculator $DOCKER_IMAGE
+            docker stop income-expense-app || true
+            docker rm income-expense-app || true
+            docker run -d -p 5000:5000 --name income-expense-app $DOCKER_IMAGE
           EOF
