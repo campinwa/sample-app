@@ -30,18 +30,18 @@ jobs:
         pytest
 
     - name: Log in to Docker Hub
-      run: echo "${{ caca556421 }}" | docker login -u "${{ campinwaladsae }}" --password-stdin
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Build Docker image
-      run: docker build -t ${{ campinwaladsae }}/income-expense-calculator:${{ github.sha }} .
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/income-expense-calculator:${{ github.sha }} .
 
     - name: Push Docker image
-      run: docker push ${{ campinwaladsae }}/income-expense-calculator:${{ github.sha }}
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/income-expense-calculator:${{ github.sha }}
 
     - name: Deploy to server
       if: github.ref == 'refs/heads/main'
       env:
-        DOCKER_IMAGE: ${{ campinwaladsae }}/income-expense-calculator:${{ github.sha }}
+        DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/income-expense-calculator:${{ github.sha }}
       run: |
         ssh user@your-server-ip <<EOF
           docker pull $DOCKER_IMAGE
