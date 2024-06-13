@@ -2,21 +2,40 @@
 <html>
 <head>
     <title>BudgetBuddy</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <style>
+        /* Inline styles specific to index.html */
+        body {
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <h1>BudgetBuddy</h1>
-    
-    <h2>Add Income</h2>
-    <input type="number" id="income" placeholder="Enter Amount">
-    <button onclick="addIncome()">Add Income</button>
-    
-    <h2>Add Expense</h2>
-    <input type="number" id="expense" placeholder="Enter Amount">
-    <button onclick="addExpense()">Add Expense</button>
-    
-    <h2>Summary</h2>
-    <button onclick="getSummary()">Get Summary</button>
-    <div id="summary"></div>
+    <div class="v420_166">
+        <div class="v420_167">
+            <div class="v420_168">
+                <h1 class="name">BudgetBuddy</h1>
+            </div>
+            <div class="v420_497"></div>
+        </div>
+
+        <div class="v420_466">
+            <div class="v420_467">
+                <div class="v420_468"></div>
+                <h2 class="v420_469">Add Income</h2>
+                <h2 class="v420_470">Add Expense</h2>
+            </div>
+            <input type="number" id="income" class="v420_471" placeholder="Enter Amount">
+            <input type="number" id="expense" class="v420_472" placeholder="Enter Amount">
+            <button onclick="addIncome()" class="v420_473">Add Income</button>
+            <button onclick="addExpense()" class="v420_474">Add Expense</button>
+        </div>
+
+        <div class="v420_477">
+            <div class="v420_478"></div>
+            <button onclick="navigateToSummary()" class="v420_479">Get Summary</button>
+        </div>
+    </div>
 
     <script>
         function addIncome() {
@@ -49,16 +68,8 @@
             });
         }
 
-        function getSummary() {
-            fetch('/summary')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('summary').innerHTML = `
-                    <p>Total Income: ${data.total_income}</p>
-                    <p>Total Expense: ${data.total_expense}</p>
-                    <p>Balance: ${data.balance}</p>
-                `;
-            });
+        function navigateToSummary() {
+            window.location.href = 'summary.html';
         }
     </script>
 </body>

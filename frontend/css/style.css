@@ -1,3 +1,5 @@
+/* style.css */
+
 * {
     box-sizing: border-box;
 }
@@ -8,7 +10,7 @@ body {
 
 .v420_166 {
     width: 100%;
-    height: 1041px;
+    height: 1024px;
     background: rgba(255,255,255,1);
     opacity: 1;
     position: relative;
@@ -19,7 +21,7 @@ body {
 
 .v420_167 {
     width: 100%;
-    height: 202px;
+    height: 282px;
     background: rgba(217,217,217,1);
     opacity: 1;
     position: relative;
@@ -31,8 +33,8 @@ body {
 .v420_168 {
     width: 100%;
     color: rgba(0,0,0,1);
-    position: absolute;
-    top: 40px;
+    position: relative;
+    top: 0px;
     left: 0px;
     font-family: Plus Jakarta Sans;
     font-weight: Regular;
@@ -41,196 +43,4 @@ body {
     text-align: center;
 }
 
-.v420_497 {
-    width: 84px;
-    height: 91px;
-    background: rgba(139,139,139,1);
-    opacity: 1;
-    position: absolute;
-    top: 39px;
-    left: 28px;
-}
-
-.name {
-    color: #fff;
-}
-
-.v420_466 {
-    width: 100%;
-    height: 375px;
-    background-color: rgba(0, 0, 0, 0.1); /* Example background color */
-    opacity: 1;
-    position: absolute;
-    top: 649px;
-    left: 0px;
-    overflow: hidden;
-}
-
-.v420_467 {
-    width: 100%;
-    height: 84px;
-    background-color: rgba(0, 0, 0, 0.1); /* Example background color */
-    padding: 6px 0px;
-    margin: 12px;
-    opacity: 1;
-    position: absolute;
-    top: 0px;
-    left: 24px;
-    overflow: hidden;
-}
-
-.v420_468 {
-    width: 12px;
-    height: 12px;
-    background: rgba(20,184,166,1);
-    position: absolute;
-    top: 36px;
-    left: 0px;
-    border-radius: 50%;
-}
-
-.v420_469 {
-    width: 678px;
-    color: rgba(115,115,115,1);
-    position: absolute;
-    top: 32px;
-    left: 24px;
-    font-family: Roboto;
-    font-weight: Medium;
-    font-size: 85px;
-    opacity: 1;
-    text-align: left;
-}
-
-.v420_470 {
-    width: 678px;
-    color: rgba(115,115,115,1);
-    position: absolute;
-    top: 32px;
-    left: 714px;
-    font-family: Roboto;
-    font-weight: Medium;
-    font-size: 85px;
-    opacity: 1;
-    text-align: right;
-}
-
-.v420_471 {
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.1); /* Example background color */
-    opacity: 1;
-    position: absolute;
-    top: 84px;
-    left: 24px;
-    overflow: hidden;
-}
-
-.v420_472 {
-    width: 100%;
-    background-color: rgba(255,255,255,1); /* Example background color */
-    opacity: 1;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    border: 1px solid rgba(212,212,212,1);
-}
-
-.v420_473 {
-    width: 100%;
-    height: 128px;
-    background-color: rgba(0, 0, 0, 0.1); /* Example background color */
-    padding: 6px 0px;
-    margin: 12px;
-    opacity: 1;
-    position: absolute;
-    top: 84px;
-    left: 24px;
-    overflow: hidden;
-}
-
-.v420_474 {
-    width: 91px;
-    height: 91px;
-    background: rgba(59,130,246,1);
-    opacity: 1;
-    position: absolute;
-    top: 18px;
-    left: 0px;
-    border-radius: 50%;
-}
-
-.v420_475 {
-    width: 638px;
-    color: rgba(64,64,64,1);
-    position: absolute;
-    top: 54px;
-    left: 103px;
-    font-family: Roboto;
-    font-weight: Regular;
-    font-size: 85px;
-    opacity: 1;
-    text-align: left;
-}
-
-.v420_476 {
-    width: 638px;
-    color: rgba(10,10,10,1);
-    position: absolute;
-    top: 54px;
-    left: 753px;
-    font-family: Roboto;
-    font-weight: Medium;
-    font-size: 85px;
-    opacity: 1;
-    text-align: right;
-}
-
-.v420_477 {
-    width: 100%;
-    height: 180px;
-    background-color: rgba(0, 0, 0, 0.1); /* Example background color */
-    padding: 6px 0px;
-    margin: 12px;
-    opacity: 1;
-    position: absolute;
-    top: 212px;
-    left: 24px;
-    overflow: hidden;
-}
-
-.v420_478 {
-    width: 91px;
-    height: 91px;
-    background: rgba(245,158,11,1);
-    opacity: 1;
-    position: absolute;
-    top: 44px;
-    left: 0px;
-    border-radius: 50%;
-}
-
-.v420_479 {
-    width: 638px;
-    color: rgba(64,64,64,1);
-    position: absolute;
-    top: 80px;
-    left: 103px;
-    font-family: Roboto;
-    font-weight: Regular;
-    font-size: 85px;
-    opacity: 1;
-    text-align: left;
-}
-
-.v420_480 {
-    width: 638px;
-    color: rgba(10,10,10,1);
-    position: absolute;
-    top: 80px;
-    left: 753px;
-    font-family: Roboto;
-    font-weight: Medium;
-    font-size: 85px;
-    opacity: 1;
-    text-align: right;
-}
+/* Add more styles as needed for index.html components */
