@@ -10,9 +10,6 @@ on:
         description: 'Parameter 1 description'
         required: false
         default: 'default_value'
-      param2:
-        description: 'Parameter 2 description'
-        required: true
 
 jobs:
   build:
