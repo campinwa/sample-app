@@ -8,8 +8,13 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
+    environment:
+      MYSQL_HOST: 'db'  # Use 'db' as MySQL host since it's the service name in Docker Compose
+      MYSQL_USER: 'root'  # Update with your MySQL username
+      MYSQL_PASSWORD: ''  # Update with your MySQL password
+      MYSQL_DB: 'income_expense_db'  # Update with your MySQL database name
     depends_on:
-      - db
+      - db  # Ensure 'web' service starts after 'db' service
 
   db:
     image: mysql:5.7
@@ -30,5 +35,5 @@ services:
     ports:
       - "8080:80"
     environment:
-      PMA_HOST: db
+      PMA_HOST: db  # Use 'db' as MySQL host for phpMyAdmin to connect to MySQL
       MYSQL_ROOT_PASSWORD: root_password
