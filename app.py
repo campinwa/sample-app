@@ -1,26 +1,38 @@
-from flask import Flask, jsonify
-from flask_mysqldb import MySQL
-
+from flask import Flask, request, jsonify, render_template
 app = Flask(__name__)
 
-# MySQL configurations
-app.config['MYSQL_HOST'] = 'db'
-app.config['MYSQL_USER'] = 'user'
-app.config['MYSQL_PASSWORD'] = 'user_password'
-app.config['MYSQL_DB'] = 'income_expense_db'
-
-mysql = MySQL(app)
+# Assuming you are storing these in-memory for simplicity
+total_income = 0
+total_expense = 0
 
 @app.route('/')
 def index():
-    return "Income and Expense Counter"
+    return render_template('index.html')
 
-@app.route('/data')
-def data():
-    cur = mysql.connection.cursor()
-    cur.execute('''SELECT * FROM your_table''')
-    rv = cur.fetchall()
-    return jsonify(rv)
+@app.route('/add_income', methods=['POST'])
+def add_income():
+    global total_income
+    data = request.get_json()
+    amount = data['amount']
+    total_income += amount
+    return jsonify({"message": "Income added", "total_income": total_income})
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+@app.route('/add_expense', methods=['POST'])
+def add_expense():
+    global total_expense
+    data = request.get_json()
+    amount = data['amount']
+    total_expense += amount
+    return jsonify({"message": "Expense added", "total_expense": total_expense})
+
+@app.route('/summary', methods=['GET'])
+def summary():
+    balance = total_income - total_expense
+    return jsonify({
+        "total_income": total_income,
+        "total_expense": total_expense,
+        "balance": balance
+    })
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
