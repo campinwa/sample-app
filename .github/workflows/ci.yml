@@ -4,15 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      param1:
-        description: 'Parameter 1 description'
-        required: false
-        default: 'default_value'
-      param2:
-        description: 'Parameter 2 description'
-        required: true
 
 jobs:
   build:
