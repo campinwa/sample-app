@@ -20,9 +20,45 @@
 
 ---
 
-## 1. WORKFLOW - DIAGRAM SEKUENS MERMAID
+## 1. WORKFLOW 
 
-### 1.1 Workflow Master Contract & Nota Premi
+## - Master Contract
+Kesepakatan master contract (berlaku 1 tahun) bisa ada revisi (adendum) juga brins, tugure actknowledgement.
+BRINS mengirimkan master contract 
+Tugure untuk direview.
+Jika master contract disetujui, Tugure mengonfirmasi persetujuan.
+Pembuatan Draft Nota & Batch premi (total premi) per bulan
+BSM (broker) kirim data debitur ke BRINS per batch
+BRINS akan review data batch dari BSM ketika sudah sesuai di kumpulin sampai full 3 batch
+Setelah kumpul 3 batch generate nota per bulan berisi 3 batch lanjut dikirm ke Tugure dan tim Finance BRINS & generate Nota di akhir bulan (setelah 3 batch terkumpul).
+Tugure review & remark (notes) jika ada kekurangan
+BRINS diminta untuk merevisi batch debitur tersebut dan mengunggah ulang.
+Nota mengikuti revisi batch (jika ada revisi batch nota ikut berubah)
+
+## - Pembayaran Premi oleh BRINS ke Tugure:
+Setelah semua batch debitur diterima (nota final terbentuk), BRINS melakukan pembayaran premi sesuai dengan nota final.
+Tugure melakukan verifikasi pembayaran premi dan melakukan rekonsiliasi pembayaran untuk memastikan apakah jumlah yang dibayar sesuai dengan nota.
+Jika pembayaran cocok, ditandai nota sebagai "fully paid."
+Jika terdapat selisih pembayaran, sistem memberi notifikasi exception ke BRINS, dan BRINS mengonfirmasi exception tersebut. Tugure kemudian menghasilkan Debit Note (DN) / Credit Note (CN), dan sistem memperbarui saldo nota.
+BRINS akan sebatas memverifikasi nota DN CN (jika ada selisih)
+## - Klaim:
+BRINS mengunggah klaim base on batch untuk diperiksa oleh Tugure.
+System melakukan validasi claim (validasi claim vs master contract)
+Tugure meninjau klaim yang diunggah dan jika claim disetujui, klaim tersebut diproses menjadi nota klaim yang kemudian diterima oleh BRINS.
+Tugure membayarkan klaim yang approved.
+Jika klaim ditolak, BRINS diminta untuk merevisi klaim tersebut.
+Jika terdapat selisih pembayaran antara nota claim dan pembayaran seharusnya maka tugure generate DN / CN
+BRINS melakukan verifikasi.
+## - Subrogasi:
+BRINS juga mengajukan subrogasi untuk setiap debitur (reference ke claim)
+System melakukan validasi subrogasi.
+Kemudian diperiksa oleh Tugure, jika subrogasi disetujui, nota subrogasi dibuat, dan status pembayaran diperbarui.
+Tugure membayarkan subrogasi.
+Jika ditolak, BRINS diminta untuk merevisi subrogasi tersebut.
+Jika terdapat selisih pembayaran antara nota subrogasi dan pembayaran seharusnya maka tugure generate DN / CN
+BRINS melakukan verifikasi.
+ 
+###1.1 Workflow Master Contract & Nota Premi
 
 ```mermaid
 sequenceDiagram
