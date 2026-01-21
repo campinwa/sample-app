@@ -58,7 +58,7 @@ Jika ditolak, BRINS diminta untuk merevisi subrogasi tersebut.
 Jika terdapat selisih pembayaran antara nota subrogasi dan pembayaran seharusnya maka tugure generate DN / CN
 BRINS melakukan verifikasi.
  
-###1.1 Workflow Master Contract & Nota Premi
+### 1.1 Workflow Master Contract & Nota Premi
 
 ```mermaid
 sequenceDiagram
