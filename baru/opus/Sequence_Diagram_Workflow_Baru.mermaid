@@ -2,13 +2,12 @@
 %% Sistem Reasuransi BRINS - TUGURE (A3M)
 
 sequenceDiagram
-    autonumber
     participant BSM as BSM (Broker)
     participant BRINS
     participant System
     participant TUGURE
     participant Finance as BRINS Finance
-    
+    autonumber
     rect rgb(230, 240, 255)
     note right of BRINS: 1. Master Contract Agreement
     BRINS->>System: Submit Master Contract
@@ -25,19 +24,8 @@ sequenceDiagram
 
     rect rgb(200, 230, 201)
     note right of BSM: 2. Batch Collection (BSM → BRINS)
-    
-    Note over BSM,BRINS: Batch 1
-    BSM->>BRINS: Send Batch 1 Data Debitur
-    BRINS->>BRINS: Review Batch 1 Data
-    
-    Note over BSM,BRINS: Batch 2
-    BSM->>BRINS: Send Batch 2 Data Debitur
-    BRINS->>BRINS: Review Batch 2 Data
-    
-    Note over BSM,BRINS: Batch 3
-    BSM->>BRINS: Send Batch 3 Data Debitur
-    BRINS->>BRINS: Review Batch 3 Data
-    
+    BSM->>BRINS: Review Debtor Data(3 Batch)
+    BRINS->>BRINS: Review Debtor Data (3 Batch)
     Note over BRINS: Kumpulkan sampai 3 batch lengkap
     BRINS->>BRINS: Consolidate All 3 Batches
     end
