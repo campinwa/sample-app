@@ -1,0 +1,89 @@
+%% Process Flow Diagram - Workflow Lama
+%% Sistem Reasuransi BRINS - TUGURE (A3M)
+
+flowchart TB
+    subgraph MC["1. MASTER CONTRACT"]
+        direction TB
+        MC1[/"BRINS Create Contract"/] --> MC2["Submit to System"]
+        MC2 --> MC3{"TUGURE Review"}
+        MC3 -->|"Approved"| MC4[("Contract ACTIVE")]
+        MC3 -->|"Rejected"| MC5["Revise Contract"]
+        MC5 --> MC2
+    end
+    
+    subgraph NP["2. NOTA PREMI (Dibuat Terlebih Dahulu)"]
+        direction TB
+        NP1[/"BRINS Create Nota Premi"/] --> NP2["Submit to TUGURE"]
+        NP2 --> NP3{"TUGURE Review"}
+        NP3 -->|"Approved"| NP4[("Nota APPROVED")]
+        NP3 -->|"Rejected"| NP5["Revise Nota"]
+        NP5 --> NP1
+    end
+    
+    subgraph BD["3. BATCH DEBITUR (Dikaitkan ke Nota yang Sudah Ada)"]
+        direction TB
+        BD1[/"Upload Batch 1"/] --> BD2["Validate vs Master Contract"]
+        BD2 --> BD3{"TUGURE Review"}
+        BD3 -->|"Approved"| BD4["Add to Nota"]
+        BD3 -->|"Rejected"| BD5["Revise Batch"]
+        BD5 --> BD1
+        BD4 --> BD6[/"Upload Batch 2"/]
+        BD6 --> BD7["Validate & Review"]
+        BD7 --> BD8[/"Upload Batch 3"/]
+        BD8 --> BD9["Validate & Review"]
+        BD9 --> BD10{{"All 3 Batches Closed?"}}
+        BD10 -->|"Yes"| BD11[("Generate NOTA FINAL")]
+    end
+    
+    subgraph PAY["4. PAYMENT & RECONCILIATION"]
+        direction TB
+        PAY1[/"BRINS Submit Payment"/] --> PAY2["TUGURE Verify"]
+        PAY2 --> PAY3{"Reconciliation Check"}
+        PAY3 -->|"Match"| PAY4[("FULLY PAID")]
+        PAY3 -->|"Exception"| PAY5["Notify BRINS"]
+        PAY5 --> PAY6["BRINS Confirm Exception"]
+        PAY6 --> PAY7["Generate DN/CN"]
+        PAY7 --> PAY8["BRINS Verify DN/CN"]
+        PAY8 --> PAY9[("Balance Updated")]
+    end
+    
+    subgraph CLM["5. CLAIM"]
+        direction TB
+        CLM1[/"BRINS Upload Claim"/] --> CLM2["Validate vs Contract"]
+        CLM2 --> CLM3{"TUGURE Review"}
+        CLM3 -->|"Approved"| CLM4["Generate Nota Klaim"]
+        CLM3 -->|"Rejected"| CLM5["Revise Claim"]
+        CLM5 --> CLM1
+        CLM4 --> CLM6["TUGURE Pay Claim"]
+        CLM6 --> CLM7{{"Payment Match?"}}
+        CLM7 -->|"Yes"| CLM8[("Claim PAID")]
+        CLM7 -->|"No"| CLM9["Generate DN/CN"]
+        CLM9 --> CLM10["BRINS Verify"]
+    end
+    
+    subgraph SUB["6. SUBROGATION"]
+        direction TB
+        SUB1[/"BRINS Submit Subrogation"/] --> SUB2["Validate Subrogation"]
+        SUB2 --> SUB3{"TUGURE Review"}
+        SUB3 -->|"Approved"| SUB4["Generate Nota Subrogasi"]
+        SUB3 -->|"Rejected"| SUB5["Revise Subrogation"]
+        SUB5 --> SUB1
+        SUB4 --> SUB6["TUGURE Pay Subrogation"]
+        SUB6 --> SUB7{{"Payment Match?"}}
+        SUB7 -->|"Yes"| SUB8[("Subrogation CLOSED")]
+        SUB7 -->|"No"| SUB9["Generate DN/CN"]
+        SUB9 --> SUB10["BRINS Verify"]
+    end
+    
+    MC4 --> NP1
+    NP4 --> BD1
+    BD11 --> PAY1
+    MC4 --> CLM1
+    CLM8 --> SUB1
+
+    style MC fill:#e3f2fd
+    style NP fill:#fff3e0
+    style BD fill:#e8f5e9
+    style PAY fill:#fff9c4
+    style CLM fill:#fce4ec
+    style SUB fill:#f3e5f5

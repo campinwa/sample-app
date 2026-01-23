@@ -1,0 +1,136 @@
+%% Sequence Diagram - Workflow Lama
+%% Sistem Reasuransi BRINS - TUGURE (A3M)
+
+sequenceDiagram
+    autonumber
+    participant BRINS
+    participant System
+    participant TUGURE
+    
+    rect rgb(230, 240, 255)
+    note right of BRINS: 1. Master Contract Agreement
+    BRINS->>System: Submit Master Contract
+    System->>TUGURE: Forward for Review
+    alt Contract Approved
+        TUGURE->>System: Approve Contract
+        System->>BRINS: Confirmation
+    else Contract Rejected
+        TUGURE->>System: Reject Contract
+        System->>BRINS: Request Revision
+        BRINS->>System: Resubmit Revised Contract
+    end
+    end
+
+    rect rgb(255, 240, 230)
+    note right of BRINS: 2. Draft Nota Premi (Dibuat SEBELUM Batch)
+    BRINS->>System: Create Draft Nota Premi (ref to Contract)
+    System->>TUGURE: Send Nota for Review
+    alt Nota Approved
+        TUGURE->>System: Approve Nota
+        System->>BRINS: Confirmation - Nota Ready
+    else Nota Rejected
+        TUGURE->>System: Reject Nota with Reason
+        System->>BRINS: Request Revision
+        BRINS->>System: Revise & Upload Nota
+        Note over BRINS,TUGURE: Repeat until approved
+    end
+    end
+
+    rect rgb(240, 255, 240)
+    note right of BRINS: 3. Batch Debitur (Link to Existing Nota)
+    
+    Note over BRINS: Batch 1
+    BRINS->>System: Upload Batch 1 (link to Nota)
+    System->>System: Validate vs Master Contract
+    System->>TUGURE: Forward Batch 1 for Review
+    alt Batch 1 Approved
+        TUGURE->>System: Approve Batch 1
+        System->>System: Add Batch 1 to Nota
+    else Batch 1 Rejected
+        TUGURE->>System: Reject with Reason
+        System->>BRINS: Request Revision
+        BRINS->>System: Revise & Reupload Batch 1
+    end
+    
+    Note over BRINS: Batch 2
+    BRINS->>System: Upload Batch 2 (link to Nota)
+    System->>System: Validate vs Master Contract
+    System->>TUGURE: Forward Batch 2 for Review
+    alt Batch 2 Approved
+        TUGURE->>System: Approve Batch 2
+        System->>System: Add Batch 2 to Nota
+    else Batch 2 Rejected
+        TUGURE->>System: Reject with Reason
+        System->>BRINS: Revise & Reupload
+    end
+    
+    Note over BRINS: Batch 3
+    BRINS->>System: Upload Batch 3 (link to Nota)
+    System->>System: Validate vs Master Contract
+    System->>TUGURE: Forward Batch 3 for Review
+    alt Batch 3 Approved
+        TUGURE->>System: Approve Batch 3
+        System->>System: Add Batch 3 to Nota
+    else Batch 3 Rejected
+        TUGURE->>System: Reject with Reason
+        System->>BRINS: Revise & Reupload
+    end
+    
+    Note over System: All 3 Batches Closed
+    System->>System: Generate NOTA FINAL
+    System->>BRINS: Nota Final Ready for Payment
+    end
+
+    rect rgb(255, 255, 230)
+    note right of BRINS: 4. Payment & Reconciliation
+    BRINS->>System: Submit Premium Payment
+    System->>TUGURE: Forward for Verification
+    TUGURE->>System: Verify & Reconcile Payment
+    alt Payment Matched
+        System->>System: Mark Nota "FULLY PAID"
+        System->>BRINS: Payment Confirmed
+    else Payment Exception
+        System->>BRINS: Notify Payment Exception
+        BRINS->>System: Confirm Exception Details
+        TUGURE->>System: Generate DN/CN
+        System->>BRINS: DN/CN for Verification
+        BRINS->>System: Verify DN/CN
+        System->>System: Update Nota Balance
+    end
+    end
+
+    rect rgb(252, 228, 236)
+    note right of BRINS: 5. Claim Processing
+    BRINS->>System: Upload Claim (base on batch)
+    System->>System: Validate Claim vs Master Contract
+    System->>TUGURE: Forward Claim for Review
+    alt Claim Approved
+        TUGURE->>System: Approve Claim
+        System->>System: Generate Nota Klaim
+        System->>BRINS: Nota Klaim Issued
+        TUGURE->>System: Process Claim Payment
+        System->>BRINS: Claim Paid
+    else Claim Rejected
+        TUGURE->>System: Reject with Reason
+        System->>BRINS: Request Revision
+        BRINS->>System: Revise & Resubmit Claim
+    end
+    end
+
+    rect rgb(243, 229, 245)
+    note right of BRINS: 6. Subrogation
+    BRINS->>System: Submit Subrogation (ref to Claim)
+    System->>System: Validate Subrogation
+    System->>TUGURE: Forward for Review
+    alt Subrogation Approved
+        TUGURE->>System: Approve Subrogation
+        System->>System: Generate Nota Subrogasi
+        TUGURE->>System: Process Subrogation Payment
+        System->>System: Update Payment Status
+        System->>BRINS: Subrogation Closed
+    else Subrogation Rejected
+        TUGURE->>System: Reject with Reason
+        System->>BRINS: Request Revision
+        BRINS->>System: Revise & Resubmit
+    end
+    end

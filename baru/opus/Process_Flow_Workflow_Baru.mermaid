@@ -1,0 +1,101 @@
+%% Process Flow Diagram - Workflow Baru
+%% Sistem Reasuransi BRINS - TUGURE (A3M)
+
+flowchart TB
+    subgraph MC["1. MASTER CONTRACT"]
+        direction TB
+        MC1[/"BRINS Submit Contract"/] --> MC2{"TUGURE Review"}
+        MC2 -->|"Acknowledged"| MC3[("Contract ACTIVE")]
+        MC2 -->|"Rejected"| MC4["Revise & Resubmit"]
+        MC4 --> MC1
+    end
+    
+    subgraph BC["2. BATCH COLLECTION (BSM → BRINS)"]
+        direction TB
+        BC1[/"BSM Send Batch 1"/] --> BC2["BRINS Review"]
+        BC2 --> BC3[/"BSM Send Batch 2"/]
+        BC3 --> BC4["BRINS Review"]
+        BC4 --> BC5[/"BSM Send Batch 3"/]
+        BC5 --> BC6["BRINS Review"]
+        BC6 --> BC7{{"3 Batches Complete?"}}
+        BC7 -->|"Yes"| BC8["Submit Combined to System"]
+        BC7 -->|"No"| BC1
+    end
+    
+    subgraph NG["3. NOTA GENERATION (Auto-Generate dari Batch)"]
+        direction TB
+        NG1["System Validates All Batches"] --> NG2["Auto-Generate Nota per Bulan"]
+        NG2 --> NG3["Send to TUGURE + BRINS Finance"]
+        NG3 --> NG4{"TUGURE Review"}
+        NG4 -->|"Accept"| NG5[("Nota ISSUED")]
+        NG4 -->|"Remarks/Notes"| NG6["Request Batch Revision"]
+        NG6 --> NG7["BRINS Revise Batch"]
+        NG7 --> NG8["Nota Auto-Updates"]
+        NG8 --> NG4
+    end
+    
+    subgraph PAY["4. PAYMENT & RECONCILIATION"]
+        direction TB
+        PAY1[/"BRINS Pay per Nota Final"/] --> PAY2["TUGURE Verify & Reconcile"]
+        PAY2 --> PAY3{"Payment Match?"}
+        PAY3 -->|"Yes"| PAY4[("FULLY PAID")]
+        PAY3 -->|"Difference"| PAY5["Exception Notification"]
+        PAY5 --> PAY6["BRINS Confirm Exception"]
+        PAY6 --> PAY7["TUGURE Generate DN/CN"]
+        PAY7 --> PAY8["BRINS Verify DN/CN"]
+        PAY8 --> PAY9[("Balance Updated")]
+    end
+    
+    subgraph CLM["5. CLAIM (dengan BDO Premi Validation)"]
+        direction TB
+        CLM1[/"BRINS Upload Claim (base on batch)"/] --> CLM2["System Validate vs Master Contract"]
+        CLM2 --> CLM3["Check BDO Premi"]
+        CLM3 --> CLM4{"TUGURE Review"}
+        CLM4 -->|"Approved"| CLM5["Process Nota Klaim"]
+        CLM4 -->|"Rejected"| CLM6["BRINS Revise Claim"]
+        CLM6 --> CLM1
+        CLM5 --> CLM7["TUGURE Pay Claim"]
+        CLM7 --> CLM8{{"Payment Match?"}}
+        CLM8 -->|"Yes"| CLM9[("Claim PAID")]
+        CLM8 -->|"No"| CLM10["Generate DN/CN"]
+        CLM10 --> CLM11["BRINS Verify"]
+    end
+    
+    subgraph SUB["6. SUBROGATION (Reference ke Claim)"]
+        direction TB
+        SUB1[/"BRINS Submit Subrogation"/] --> SUB2["System Validate (ref to Claim)"]
+        SUB2 --> SUB3{"TUGURE Review"}
+        SUB3 -->|"Approved"| SUB4["Generate Nota Subrogasi"]
+        SUB3 -->|"Rejected"| SUB5["BRINS Revise"]
+        SUB5 --> SUB1
+        SUB4 --> SUB6["TUGURE Pay Subrogation"]
+        SUB6 --> SUB7{{"Payment Match?"}}
+        SUB7 -->|"Yes"| SUB8[("Subrogation PAID/CLOSED")]
+        SUB7 -->|"No"| SUB9["Generate DN/CN"]
+        SUB9 --> SUB10["BRINS Verify"]
+    end
+    
+    subgraph CALC["Payment Calculation Rule"]
+        direction LR
+        CALC1["Total Premium Due"] --> CALC2{"Check Claims Previous Month"}
+        CALC2 -->|"Has Claims"| CALC3["Deduct Claim Amount"]
+        CALC2 -->|"No Claims"| CALC4["Full Premium"]
+        CALC3 --> CALC5["Net Premium to Pay"]
+        CALC4 --> CALC5
+    end
+    
+    MC3 --> BC1
+    BC8 --> NG1
+    NG5 --> PAY1
+    MC3 --> CLM1
+    CLM9 --> SUB1
+    CLM9 --> CALC1
+    CALC5 -.->|"affects"| PAY1
+
+    style MC fill:#e3f2fd
+    style BC fill:#c8e6c9
+    style NG fill:#fff3e0
+    style PAY fill:#fff9c4
+    style CLM fill:#fce4ec
+    style SUB fill:#f3e5f5
+    style CALC fill:#e0f7fa

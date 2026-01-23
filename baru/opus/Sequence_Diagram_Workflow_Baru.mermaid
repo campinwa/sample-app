@@ -1,0 +1,137 @@
+%% Sequence Diagram - Workflow Baru
+%% Sistem Reasuransi BRINS - TUGURE (A3M)
+
+sequenceDiagram
+    autonumber
+    participant BSM as BSM (Broker)
+    participant BRINS
+    participant System
+    participant TUGURE
+    participant Finance as BRINS Finance
+    
+    rect rgb(230, 240, 255)
+    note right of BRINS: 1. Master Contract Agreement
+    BRINS->>System: Submit Master Contract
+    System->>TUGURE: Forward for Review
+    alt Contract Acknowledged
+        TUGURE->>System: Acknowledge Contract
+        System->>BRINS: Contract Active
+    else Contract Rejected
+        TUGURE->>System: Reject with Notes
+        System->>BRINS: Request Revision
+        BRINS->>System: Revise Contract
+    end
+    end
+
+    rect rgb(200, 230, 201)
+    note right of BSM: 2. Batch Collection (BSM → BRINS)
+    
+    Note over BSM,BRINS: Batch 1
+    BSM->>BRINS: Send Batch 1 Data Debitur
+    BRINS->>BRINS: Review Batch 1 Data
+    
+    Note over BSM,BRINS: Batch 2
+    BSM->>BRINS: Send Batch 2 Data Debitur
+    BRINS->>BRINS: Review Batch 2 Data
+    
+    Note over BSM,BRINS: Batch 3
+    BSM->>BRINS: Send Batch 3 Data Debitur
+    BRINS->>BRINS: Review Batch 3 Data
+    
+    Note over BRINS: Kumpulkan sampai 3 batch lengkap
+    BRINS->>BRINS: Consolidate All 3 Batches
+    end
+
+    rect rgb(255, 243, 224)
+    note right of BRINS: 3. Nota Generation (Setelah 3 Batch Terkumpul)
+    BRINS->>System: Submit Combined Batch (3 batches as 1)
+    System->>System: Validate All Batches vs Master Contract
+    System->>System: Auto-Generate Nota per Bulan
+    System->>TUGURE: Send Nota + Batch Data for Review
+    System->>Finance: Notify Nota Generated
+    
+    alt TUGURE Accepts
+        TUGURE->>System: Approve with Remarks (if any)
+        System->>System: Mark Nota as ISSUED
+        System->>BRINS: Nota Final Ready
+    else TUGURE Requests Revision
+        TUGURE->>System: Add Remarks/Notes for Changes
+        System->>BRINS: Request Batch Revision
+        BRINS->>System: Revise & Reupload Batch Data
+        System->>System: Auto-Update Nota (follows batch changes)
+        Note over System: Nota amount recalculated automatically
+        System->>TUGURE: Updated Nota for Review
+    end
+    end
+
+    rect rgb(255, 249, 196)
+    note right of BRINS: 4. Payment & Reconciliation
+    Note over System: Check Claims from Previous Month
+    System->>System: Calculate Net Premium (Premium - Claims)
+    
+    BRINS->>System: Submit Premium Payment (per Nota Final)
+    System->>TUGURE: Forward for Verification
+    TUGURE->>System: Verify & Reconcile Payment
+    
+    alt Payment Matched
+        System->>System: Mark as "FULLY PAID"
+        System->>BRINS: Payment Confirmed
+        System->>Finance: Update Payment Status
+    else Payment Difference
+        System->>BRINS: Exception Notification
+        BRINS->>System: Confirm Exception Details
+        TUGURE->>System: Generate DN/CN
+        System->>BRINS: DN/CN for Verification
+        BRINS->>System: Verify DN/CN
+        System->>System: Update Balance
+    end
+    end
+
+    rect rgb(252, 228, 236)
+    note right of BRINS: 5. Claim Processing
+    BRINS->>System: Upload Claim (base on batch, ref: nomor polis)
+    System->>System: Validate Claim vs Master Contract
+    System->>System: Check BDO Premi Verification
+    System->>TUGURE: Forward Claim for Review
+    
+    alt Claim Approved
+        TUGURE->>System: Approve Claim
+        System->>System: Process Nota Klaim
+        System->>BRINS: Nota Klaim Received
+        TUGURE->>System: Pay Approved Claim
+        System->>BRINS: Claim Payment Completed
+        alt Payment Difference
+            TUGURE->>System: Generate DN/CN
+            System->>BRINS: DN/CN for Verification
+        end
+    else Claim Rejected
+        TUGURE->>System: Reject with Reason
+        System->>BRINS: Request Revision
+        BRINS->>System: Revise & Resubmit Claim
+    end
+    end
+
+    rect rgb(243, 229, 245)
+    note right of BRINS: 6. Subrogation (Reference ke Claim - nomor polis)
+    BRINS->>System: Submit Subrogation (ref to Claim via nomor polis)
+    System->>System: Validate Subrogation (must have valid Claim)
+    System->>TUGURE: Forward for Review
+    
+    alt Subrogation Approved
+        TUGURE->>System: Approve Subrogation
+        System->>System: Generate Nota Subrogasi
+        System->>BRINS: Nota Subrogasi Issued
+        TUGURE->>System: Process Subrogation Payment
+        System->>System: Update Payment Status
+        alt Payment Difference
+            TUGURE->>System: Generate DN/CN
+            System->>BRINS: DN/CN for Verification
+            BRINS->>System: Verify DN/CN
+        end
+        System->>BRINS: Subrogation Paid/Closed
+    else Subrogation Rejected
+        TUGURE->>System: Reject with Reason
+        System->>BRINS: Request Revision
+        BRINS->>System: Revise & Resubmit Subrogation
+    end
+    end

@@ -1,0 +1,104 @@
+%% Entity Relationship Diagram - Workflow Lama
+%% Sistem Reasuransi BRINS - TUGURE (A3M)
+
+erDiagram
+    MASTER_CONTRACT_LAMA ||--o{ NOTA_PREMI_LAMA : "1:N creates"
+    NOTA_PREMI_LAMA ||--o{ BATCH_LAMA : "1:N contains"
+    BATCH_LAMA ||--o{ DEBTOR_LAMA : "1:N has"
+    BATCH_LAMA ||--o{ RECORD_LAMA : "1:N tracks"
+    NOTA_PREMI_LAMA ||--o{ PAYMENT_LAMA : "1:N receives"
+    NOTA_PREMI_LAMA ||--o{ DN_CN_LAMA : "1:N adjusted_by"
+    DEBTOR_LAMA ||--o{ CLAIM_LAMA : "1:N files"
+    CLAIM_LAMA ||--o{ SUBROGATION_LAMA : "1:N triggers"
+    MASTER_CONTRACT_LAMA ||--o{ CLAIM_LAMA : "1:N covers"
+    
+    MASTER_CONTRACT_LAMA {
+        string contract_id PK
+        string contract_number UK
+        string policy_no
+        string cedant
+        string reinsurer
+        date effective_start
+        date effective_end
+        string status
+        number coverage_percentage
+        number premium_rate
+    }
+    
+    NOTA_PREMI_LAMA {
+        string nota_id PK
+        string nota_number UK
+        string contract_id FK
+        string period
+        number draft_amount
+        number final_amount
+        string status
+        boolean is_final
+        date created_date
+        date approved_date
+    }
+    
+    BATCH_LAMA {
+        string batch_id PK
+        string nota_id FK
+        number batch_sequence
+        number total_records
+        number total_exposure
+        number total_premium
+        string status
+        date submitted_date
+        date approved_date
+    }
+    
+    DEBTOR_LAMA {
+        string debtor_id PK
+        string batch_id FK
+        string nomor_peserta
+        string nama_peserta
+        number plafon
+        number nominal_premi
+        string status
+    }
+    
+    RECORD_LAMA {
+        string record_id PK
+        string batch_id FK
+        string debtor_id FK
+        string record_status
+        number exposure_amount
+        number premium_amount
+    }
+    
+    PAYMENT_LAMA {
+        string payment_id PK
+        string nota_id FK
+        string payment_ref
+        number amount
+        date payment_date
+        string match_status
+    }
+    
+    DN_CN_LAMA {
+        string note_id PK
+        string nota_id FK
+        string note_type
+        number adjustment_amount
+        string reason_code
+        string status
+    }
+    
+    CLAIM_LAMA {
+        string claim_id PK
+        string debtor_id FK
+        string contract_id FK
+        string claim_no
+        number nilai_klaim
+        string status
+    }
+    
+    SUBROGATION_LAMA {
+        string subro_id PK
+        string claim_id FK
+        number recovery_amount
+        string status
+    }

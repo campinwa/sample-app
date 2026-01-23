@@ -1,0 +1,174 @@
+%% Entity Relationship Diagram - Workflow Baru
+%% Sistem Reasuransi BRINS - TUGURE (A3M)
+
+erDiagram
+    MASTER_CONTRACT_BARU ||--o{ BATCH_BARU : "1:N covers"
+    BATCH_BARU ||--o{ DEBTOR_BARU : "1:N contains"
+    BATCH_BARU ||--o{ RECORD_BARU : "1:N tracks"
+    BATCH_BARU }o--|| NOTA_BARU : "N:1 aggregates_to"
+    NOTA_BARU ||--o{ PAYMENT_BARU : "1:N receives"
+    NOTA_BARU ||--o{ DN_CN_BARU : "1:N adjusted_by"
+    DEBTOR_BARU ||--o{ CLAIM_BARU : "1:N files"
+    CLAIM_BARU ||--|| NOTA_CLAIM : "1:1 generates"
+    CLAIM_BARU ||--o{ SUBROGATION_BARU : "1:N triggers"
+    SUBROGATION_BARU ||--|| NOTA_SUBRO : "1:1 generates"
+    MASTER_CONTRACT_BARU ||--o{ CLAIM_BARU : "1:N covers"
+    MASTER_CONTRACT_BARU ||--o{ VALIDATION_RULE : "1:N defines"
+    
+    MASTER_CONTRACT_BARU {
+        string contract_id PK
+        string policy_no UK
+        string program_id
+        string loan_type
+        string loan_type_desc
+        date coverage_start_date
+        date coverage_end_date
+        number max_tenor_month
+        number max_plafond
+        number share_tugure_percentage
+        number premium_rate
+        number ric_rate
+        number bf_rate
+        string allowed_kolektabilitas
+        string allowed_region
+        string effective_status
+        number version
+        string parent_contract_id
+    }
+    
+    VALIDATION_RULE {
+        string rule_id PK
+        string contract_id FK
+        string rule_name
+        string file_columns_used
+        string master_columns_used
+        string logic_rule
+        string tolerance_parameter
+        string fail_action
+        string severity
+    }
+    
+    BATCH_BARU {
+        string batch_id PK
+        string contract_id FK
+        number batch_month
+        number batch_year
+        number total_records
+        number total_exposure
+        number total_premium
+        number final_exposure_amount
+        number final_premium_amount
+        boolean debtor_review_completed
+        boolean batch_ready_for_nota
+        string status
+        boolean operational_locked
+        string reopen_reason
+        string reopen_impact
+    }
+    
+    DEBTOR_BARU {
+        string debtor_id PK
+        string batch_id FK
+        string contract_id FK
+        number cover_id
+        string program_id
+        string nomor_peserta UK
+        string nomor_rekening_pinjaman
+        string loan_type
+        date tanggal_mulai_covering
+        date tanggal_akhir_covering
+        number plafon
+        number nominal_premi
+        number net_premi
+        number kolektabilitas
+        number flag_restruktur
+        string status
+        number version_no
+        boolean is_locked
+        string validation_remarks
+    }
+    
+    RECORD_BARU {
+        string record_id PK
+        string batch_id FK
+        string debtor_id FK
+        string record_status
+        number exposure_amount
+        number premium_amount
+        number revision_count
+        string revision_reason
+    }
+    
+    NOTA_BARU {
+        string nota_number PK
+        string nota_type
+        string reference_id FK
+        string contract_id FK
+        number amount
+        string currency
+        string status
+        boolean is_immutable
+        string reconciliation_status
+        number total_actual_paid
+    }
+    
+    NOTA_CLAIM {
+        string nota_number PK
+        string claim_id FK
+        number amount
+        string status
+    }
+    
+    NOTA_SUBRO {
+        string nota_number PK
+        string subro_id FK
+        number amount
+        string status
+    }
+    
+    PAYMENT_BARU {
+        string payment_id PK
+        string nota_number FK
+        string payment_ref
+        number amount
+        date payment_date
+        string match_status
+        string exception_type
+        boolean is_actual_payment
+    }
+    
+    DN_CN_BARU {
+        string note_number PK
+        string nota_number FK
+        string note_type
+        number adjustment_amount
+        string reason_code
+        string reason_description
+        string status
+    }
+    
+    CLAIM_BARU {
+        string claim_no PK
+        string debtor_id FK
+        string contract_id FK
+        string policy_no
+        string nomor_sertifikat
+        string nama_tertanggung
+        number plafond
+        number max_coverage
+        number nilai_klaim
+        number share_tugure_percentage
+        number share_tugure_amount
+        boolean check_bdo_premi
+        string status
+    }
+    
+    SUBROGATION_BARU {
+        string subro_id PK
+        string claim_id FK
+        string debtor_id FK
+        number recovery_amount
+        date recovery_date
+        string status
+        string remarks
+    }

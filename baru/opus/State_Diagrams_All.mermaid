@@ -1,0 +1,171 @@
+%% State Diagrams - Workflow Lama vs Baru
+%% Sistem Reasuransi BRINS - TUGURE (A3M)
+
+%% ========================================
+%% WORKFLOW LAMA - State Diagrams
+%% ========================================
+
+%% === Nota Status Flow (Lama) ===
+%% Nota dibuat SEBELUM batch, status flow lebih kompleks
+
+stateDiagram-v2
+    [*] --> DRAFT: BRINS creates Nota first
+    DRAFT --> SUBMITTED: Submit to System
+    SUBMITTED --> UNDER_REVIEW: Forward to TUGURE
+    UNDER_REVIEW --> APPROVED: TUGURE approves
+    UNDER_REVIEW --> REJECTED: TUGURE rejects
+    REJECTED --> REVISION_REQUIRED: Need changes
+    REVISION_REQUIRED --> DRAFT: BRINS revises
+    APPROVED --> WAITING_BATCH: Waiting for batches
+    WAITING_BATCH --> BATCH_1_ADDED: Batch 1 approved
+    BATCH_1_ADDED --> BATCH_2_ADDED: Batch 2 approved
+    BATCH_2_ADDED --> BATCH_3_ADDED: Batch 3 approved
+    BATCH_3_ADDED --> FINAL: Generate Final Nota
+    FINAL --> PAID: Payment received
+    PAID --> [*]
+
+---
+
+%% === Batch Status Flow (Lama) ===
+%% Batch dikaitkan ke Nota yang sudah ada
+
+stateDiagram-v2
+    [*] --> UPLOADED: BRINS uploads batch
+    UPLOADED --> VALIDATED: System validates vs Master Contract
+    VALIDATED --> UNDER_REVIEW: Forward to TUGURE
+    UNDER_REVIEW --> APPROVED: TUGURE approves
+    UNDER_REVIEW --> REJECTED: TUGURE rejects
+    REJECTED --> UPLOADED: BRINS revises & reuploads
+    APPROVED --> ADDED_TO_NOTA: Add to existing Nota
+    ADDED_TO_NOTA --> CLOSED: Finalized
+    CLOSED --> [*]
+
+---
+
+%% ========================================
+%% WORKFLOW BARU - State Diagrams
+%% ========================================
+
+%% === Batch Status Flow (Baru) ===
+%% Batch independent, nota di-generate otomatis setelah 3 batch
+
+stateDiagram-v2
+    [*] --> Uploaded: BSM sends to BRINS, BRINS uploads
+    Uploaded --> Validated: System validates vs Master Contract
+    Validated --> Matched: Match with contract rules
+    Matched --> Approved: TUGURE approves
+    Matched --> Rejected: TUGURE rejects
+    Rejected --> Uploaded: Revise & reupload
+    
+    state check_batches <<choice>>
+    Approved --> check_batches: Check batch count
+    check_batches --> Waiting: Less than 3 batches
+    check_batches --> Nota_Issued: 3 batches complete
+    
+    Waiting --> Approved: Wait for more batches
+    Nota_Issued --> Branch_Confirmed: BRINS Finance confirms
+    Branch_Confirmed --> Paid: Payment received
+    Paid --> Closed: Reconciliation complete
+    Closed --> [*]
+    
+    state reopen_flow {
+        Closed --> Reopen_Requested: Request reopen
+        Reopen_Requested --> Reopened: Supervisor approves
+        Reopened --> Uploaded: Back to revision
+    }
+
+---
+
+%% === Nota Status Flow (Baru) ===
+%% Nota auto-generated setelah 3 batch, immutable after issued
+
+stateDiagram-v2
+    [*] --> Draft: Auto-created when 3 batches collected
+    
+    state immutable_check <<choice>>
+    Draft --> immutable_check: Issue nota
+    immutable_check --> Issued: Amount locked (immutable)
+    
+    note right of Issued: Amount becomes IMMUTABLE
+    
+    Issued --> Confirmed: BRINS confirms
+    
+    state batch_revision <<choice>>
+    Confirmed --> batch_revision: Check if batch revised
+    batch_revision --> Draft: Batch revised - nota auto-updates
+    batch_revision --> Awaiting_Payment: No revision
+    
+    Awaiting_Payment --> Paid: Payment matched
+    Paid --> [*]: Reconciliation complete
+
+---
+
+%% === Claim Status Flow (Baru) ===
+%% Dengan BDO Premi validation
+
+stateDiagram-v2
+    [*] --> Draft: BRINS uploads claim
+    Draft --> Validated: System validates
+    
+    state validation {
+        Validated --> Contract_Check: Check vs Master Contract
+        Contract_Check --> BDO_Check: Check BDO Premi
+    }
+    
+    BDO_Check --> Checked: Validation passed
+    Checked --> Doc_Verified: Document verification
+    Doc_Verified --> Invoiced: Generate Claim Nota
+    Invoiced --> Paid: TUGURE pays claim
+    Paid --> [*]
+    
+    Draft --> Rejected: Validation fails
+    Checked --> Rejected: Check fails
+    Rejected --> Draft: Revise & resubmit
+
+---
+
+%% === Subrogation Status Flow (Baru) ===
+%% Reference ke claim required
+
+stateDiagram-v2
+    [*] --> Draft: BRINS submits (ref to claim)
+    
+    state claim_validation <<choice>>
+    Draft --> claim_validation: Validate claim reference
+    claim_validation --> Valid: Claim exists & paid
+    claim_validation --> Invalid: No valid claim
+    Invalid --> Draft: Fix reference
+    
+    Valid --> Under_Review: Forward to TUGURE
+    Under_Review --> Invoiced: TUGURE approves
+    Under_Review --> Rejected: TUGURE rejects
+    Rejected --> Draft: Revise & resubmit
+    
+    Invoiced --> Paid_Closed: Payment complete
+    Paid_Closed --> [*]
+
+---
+
+%% === Master Contract Status Flow (Baru) ===
+%% Dual approval dengan versioning
+
+stateDiagram-v2
+    [*] --> Draft: Create new contract
+    Draft --> Pending_First_Approval: Submit for approval
+    
+    Pending_First_Approval --> First_Rejected: First approver rejects
+    First_Rejected --> Draft: Revise contract
+    
+    Pending_First_Approval --> Pending_Second_Approval: First approved
+    
+    Pending_Second_Approval --> Second_Rejected: Second approver rejects
+    Second_Rejected --> Draft: Revise contract
+    
+    Pending_Second_Approval --> Active: Second approved
+    
+    Active --> Inactive: Deactivate
+    Inactive --> Active: Reactivate
+    Active --> Archived: Archive (create new version)
+    Archived --> [*]
+    
+    note right of Active: Contract is now operational
