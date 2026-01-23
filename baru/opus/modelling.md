@@ -196,6 +196,186 @@ graph TB
 
 ### 1.3 Data Model - Key Entities Detail### 1.4 Information States and Lifecycles
 
+erDiagram
+    MASTER_CONTRACT ||--o{ VALIDATION_RULE : "defines"
+    MASTER_CONTRACT ||--o{ BATCH : "governs"
+    MASTER_CONTRACT ||--o{ CLAIM : "covers"
+    
+    BATCH ||--o{ DEBTOR : "contains"
+    BATCH }o--|| NOTA_BATCH : "aggregates to (3:1)"
+    
+    DEBTOR ||--o{ CLAIM : "may file"
+    
+    CLAIM ||--|| NOTA_CLAIM : "generates"
+    CLAIM ||--o{ SUBROGATION : "may trigger"
+    
+    SUBROGATION ||--|| NOTA_SUBROGATION : "generates"
+    
+    NOTA_BATCH ||--o{ PAYMENT : "receives"
+    NOTA_CLAIM ||--o{ PAYMENT : "receives"
+    NOTA_SUBROGATION ||--o{ PAYMENT : "receives"
+    
+    NOTA_BATCH ||--o{ DN_CN : "may have adjustments"
+    PAYMENT ||--o{ DN_CN : "may generate"
+    
+    MASTER_CONTRACT {
+        string contract_id PK "Unique identifier"
+        string policy_no UK "Policy number"
+        string program_id "Program identifier"
+        string loan_type "Type of loan covered"
+        date coverage_start_date "Coverage begins"
+        date coverage_end_date "Coverage ends"
+        decimal share_tugure_percentage "Tugure's share %"
+        decimal premium_rate "Premium rate %"
+        decimal ric_rate "RIC rate %"
+        decimal bf_rate "BF rate %"
+        string allowed_kolektabilitas "Valid collectibility values"
+        string allowed_region "Allowed regions"
+        string effective_status "Draft|Active|Inactive"
+        int version "Version number for amendments"
+        string parent_contract_id FK "For version tracking"
+        datetime first_approved_date "First approval timestamp"
+        datetime second_approved_date "Second approval timestamp"
+    }
+    
+    VALIDATION_RULE {
+        string rule_id PK "Unique identifier"
+        string contract_id FK "Links to contract"
+        string rule_name "Name of validation rule"
+        string logic_rule "Business logic expression"
+        string fail_action "REJECT|WARNING|CONDITIONAL"
+        string severity "HIGH|MEDIUM|LOW"
+        boolean is_active "Rule active status"
+    }
+    
+    BATCH {
+        string batch_id PK "Unique identifier"
+        string contract_id FK "Links to contract"
+        int batch_month "1-12"
+        int batch_year "Year"
+        int total_records "Count of debtors"
+        decimal total_exposure "Sum of plafon (raw)"
+        decimal total_premium "Sum of premium (raw)"
+        decimal final_exposure_amount "Approved debtors only"
+        decimal final_premium_amount "Approved debtors only"
+        boolean debtor_review_completed "All debtors reviewed"
+        boolean batch_ready_for_nota "Ready to generate nota"
+        string status "Uploaded|Validated|Matched|Approved|Nota_Issued|Closed"
+        boolean operational_locked "Locked when closed"
+        datetime validated_date "Validation timestamp"
+        datetime approved_date "Approval timestamp"
+        datetime nota_issued_date "Nota generation timestamp"
+        datetime closed_date "Closure timestamp"
+    }
+    
+    DEBTOR {
+        string debtor_id PK "Auto-generated ID"
+        string batch_id FK "Links to batch"
+        string contract_id FK "Links to contract"
+        string nomor_peserta UK "Participant number"
+        string nomor_rekening_pinjaman "Loan account number"
+        string nama_peserta "Participant name"
+        string loan_type "Loan type code"
+        date tanggal_mulai_covering "Coverage start"
+        date tanggal_akhir_covering "Coverage end"
+        decimal plafon "Loan amount"
+        decimal nominal_premi "Gross premium"
+        decimal premi_percentage "Premium %"
+        decimal ric_percentage "RIC %"
+        decimal bf_percentage "BF %"
+        decimal net_premi "Net premium after deductions"
+        string unit_code "Unit code"
+        string region_desc "Region"
+        int kolektabilitas "1-5 collectibility"
+        int flag_restruktur "0 or 1"
+        string status "DRAFT|SUBMITTED|APPROVED|REJECTED|CONDITIONAL"
+        boolean is_locked "Locked after batch closed"
+        string rejection_reason "Reason if rejected"
+        string validation_remarks "Validation notes"
+        int version_no "Version for amendments"
+    }
+    
+    NOTA_BATCH {
+        string nota_number PK "Invoice number"
+        string nota_type "BATCH"
+        string reference_id FK "Batch reference (aggregated)"
+        string contract_id FK "Links to contract"
+        decimal amount "IMMUTABLE after issued"
+        string currency "IDR"
+        string status "Draft|Issued|Confirmed|Paid"
+        boolean is_immutable "TRUE after issued"
+        string reconciliation_status "PENDING|PARTIAL|MATCHED|OVERPAID|FINAL"
+        datetime issued_date "Issuance timestamp"
+        datetime confirmed_date "Confirmation timestamp"
+        datetime paid_date "Payment timestamp"
+        string payment_reference "Payment ref number"
+        decimal total_actual_paid "Actual payment received"
+    }
+    
+    CLAIM {
+        string claim_no PK "Claim number"
+        string debtor_id FK "Links to debtor"
+        string contract_id FK "Links to contract"
+        string policy_no "Policy reference"
+        string nomor_sertifikat "Certificate number"
+        string nama_tertanggung "Insured name"
+        date tanggal_kejadian "Incident date"
+        date tanggal_meninggal "Death date (if applicable)"
+        decimal nilai_klaim "Claim amount"
+        decimal share_tugure_amount "Tugure's share of claim"
+        string status "Draft|Checked|Doc_Verified|Invoiced|Paid"
+        boolean check_bdo_premi "Validate against premium BDO"
+        string rejection_reason "Reason if rejected"
+    }
+    
+    NOTA_CLAIM {
+        string nota_number PK "Claim invoice number"
+        string nota_type "CLAIM"
+        string claim_id FK "Links to claim"
+        decimal amount "Claim payout amount"
+        string status "Draft|Issued|Paid"
+        datetime issued_date "Issuance timestamp"
+    }
+    
+    SUBROGATION {
+        string subro_id PK "Subrogation ID"
+        string claim_id FK "Links to claim"
+        string debtor_id FK "Links to debtor"
+        decimal recovery_amount "Amount recovered"
+        string status "Draft|Invoiced|Paid_Closed"
+        datetime recovery_date "Recovery timestamp"
+    }
+    
+    NOTA_SUBROGATION {
+        string nota_number PK "Subrogation invoice"
+        string nota_type "SUBROGATION"
+        string subro_id FK "Links to subrogation"
+        decimal amount "Recovery amount"
+        string status "Draft|Issued|Paid"
+        datetime issued_date "Issuance timestamp"
+    }
+    
+    PAYMENT {
+        string payment_id PK "Payment ID"
+        string nota_number FK "Links to nota"
+        string payment_ref "Bank reference"
+        decimal amount "Payment amount"
+        date payment_date "Payment date"
+        string match_status "PENDING|MATCHED|PARTIAL|OVERPAID|UNMATCHED"
+        string exception_type "UNDERPAYMENT|OVERPAYMENT|TIMING"
+        datetime reconciled_date "Reconciliation timestamp"
+    }
+    
+    DN_CN {
+        string note_number PK "DN/CN number"
+        string nota_number FK "Links to nota"
+        string note_type "DEBIT|CREDIT"
+        decimal adjustment_amount "Adjustment value"
+        string reason_code "Reason for adjustment"
+        string status "Draft|Issued|Verified|Applied"
+        datetime issued_date "Issuance timestamp"
+    }
+    
 ```mermaid
 stateDiagram-v2
     [*] --> MasterContract
