@@ -389,8 +389,8 @@ stateDiagram-v2
         PendingFirstApproval --> PendingSecondApproval : First Approve
         PendingSecondApproval --> Draft : Reject
         PendingSecondApproval --> Active : Second Approve
-        Active --> Inactive : Expire/Terminate
-        Active --> Active : Amend (new version)
+        Active --> Inactive : Expire or Terminate
+        Active --> Active : Amend new version
         Inactive --> [*]
     }
     
@@ -398,12 +398,12 @@ stateDiagram-v2
     
     state Batch {
         [*] --> Uploaded
-        Uploaded --> Validated : Auto-validate
+        Uploaded --> Validated : Auto validate
         Validated --> Matched : Match rules
         Matched --> Approved : TUGURE approves
         Matched --> Rejected : TUGURE rejects
         Rejected --> Uploaded : Revise
-        Approved --> NotaIssued : Generate nota (after 3 batches)
+        Approved --> NotaIssued : Generate nota after 3 batches
         NotaIssued --> BranchConfirmed : Finance confirms
         BranchConfirmed --> Paid : Payment received
         Paid --> Closed : Reconciliation complete
@@ -412,21 +412,21 @@ stateDiagram-v2
         Reopened --> Uploaded : Back to revision
         Closed --> [*]
     }
-    
-    Batch --> Nota : "Aggregate 3:1"
-    
+
     state Nota {
         [*] --> NotaDraft
-        NotaDraft --> Issued : Issue (becomes immutable)
+        NotaDraft --> Issued : Issue
         Issued --> Confirmed : BRINS confirms
         Confirmed --> NotaPaid : Payment matched
         NotaPaid --> [*]
         
         note right of Issued
             Amount becomes IMMUTABLE
-            Auto-updates if batch revised
+            Auto updates if batch revised
         end note
     }
+
+    Batch --> Nota : Aggregate three batches into one
     
     Batch --> Debtor : Contains
     
@@ -464,6 +464,7 @@ stateDiagram-v2
         SubroInvoiced --> SubroPaidClosed : Payment received
         SubroPaidClosed --> [*]
     }
+
 ```
 
 ---
