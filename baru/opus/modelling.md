@@ -413,7 +413,7 @@ stateDiagram-v2
         Closed --> [*]
     }
     
-    Batch --> Nota : Aggregate 3:1
+    Batch --> Nota : "Aggregate 3:1"
     
     state Nota {
         [*] --> NotaDraft
