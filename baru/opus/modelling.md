@@ -194,8 +194,7 @@ graph TB
     VR -.validates.-> CLM
 ```
 
-### 1.3 Data Model - Key Entities Detail### 1.4 Information States and Lifecycles
-
+### 1.3 Data Model - Key Entities Detail
 erDiagram
     MASTER_CONTRACT ||--o{ VALIDATION_RULE : "defines"
     MASTER_CONTRACT ||--o{ BATCH : "governs"
@@ -375,6 +374,7 @@ erDiagram
         string status "Draft|Issued|Verified|Applied"
         datetime issued_date "Issuance timestamp"
     }
+### 1.4 Information States and Lifecycles
     
 ```mermaid
 stateDiagram-v2
