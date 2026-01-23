@@ -195,7 +195,7 @@ graph TB
 ```
 
 ### 1.3 Data Model - Key Entities Detail
-```Mermaid
+```mermaid
 erDiagram
     MASTER_CONTRACT ||--o{ VALIDATION_RULE : "defines"
     MASTER_CONTRACT ||--o{ BATCH : "governs"
@@ -378,7 +378,7 @@ erDiagram
 ```
 ### 1.4 Information States and Lifecycles
     
-```
+```mermaid
 stateDiagram-v2
     [*] --> MasterContract
     
